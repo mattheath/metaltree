@@ -1,5 +1,26 @@
 require 'open-uri'
 require 'nokogiri'
+require 'aws'
+
+aws_access_key_id = ''
+aws_secret_access_key = ''
+
+queue_name = 'properties'
+
+# Get started with SQS in the EU
+sqs_client = AWS::SQS.new(
+  :access_key_id => aws_access_key_id,
+  :secret_access_key => aws_secret_access_key,
+  :sqs_endpoint => 'sqs.eu-west-1.amazonaws.com'
+)
+
+# Ensure our queue exists
+begin
+  queue = sqs_client.queues.create(queue_name)
+  puts "Queue Created: " + queue.url
+rescue => err
+  puts err.to_s
+end
 
 # Our base uri
 uri = "http://www.gumtree.com/flatshare/london/page"
