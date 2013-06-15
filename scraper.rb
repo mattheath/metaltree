@@ -21,10 +21,13 @@ while results_found do
 
   # Run through results
   items.each do |item|
+
+    id = item.css("a.description")[0]['id'].scan(/\d+/).first
     title = item.css("h3")
     link = item.css("a")[0]['href']
 
     puts "Title: #{title}"
+    puts "Gumtree ID: #{id}"
     puts "Link: #{link}"
     puts ""
   end
