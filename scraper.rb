@@ -75,17 +75,23 @@ while results_found do
 
     # Build our message
     message = {
-      "link"       => link,
-      "provider"   => "gumtree",
-      "providerId" => id,
-      "title"      => title,
-      "created"    => timestamp
+      "link"        => link,
+      "provider"    => "gumtree",
+      "provider_id" => id,
+      "title"       => title,
+      "created"     => timestamp
     }
 
-    puts message
+    puts message.to_json
     puts ""
 
+    # Send message
+    status = queue.send_message message.to_json
+    puts "Sent with id: #{status.message_id}"
+
   end
+
+  exit
 
   # increment page number
   page += 1
