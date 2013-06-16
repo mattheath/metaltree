@@ -1,25 +1,27 @@
+require 'toml'
 require 'open-uri'
 require 'nokogiri'
 require 'aws'
 require 'active_support/all'
 
-aws_access_key_id = ''
-aws_secret_access_key = ''
+# Load Config
+path = File.join(File.dirname(__FILE__), 'config', 'config.toml')
+CONFIG = TOML.load_file(path)
 
-# Our base uri
-uri = "http://www.gumtree.com/flatshare/london/page"
+# Base uri we'll scrape
+uri = CONFIG['uri']
 
 # Starting page
 page = 1
 
 # SQS queue to use
-queue_name = 'properties'
+queue_name = CONFIG['aws']['sqs']['queue_name']
 
 # Get started with SQS in the EU
 sqs_client = AWS::SQS.new(
-  :access_key_id => aws_access_key_id,
-  :secret_access_key => aws_secret_access_key,
-  :sqs_endpoint => 'sqs.eu-west-1.amazonaws.com'
+  :access_key_id => CONFIG['aws']['access_key_id'],
+  :secret_access_key => CONFIG['aws']['secret_access_key'],
+  :sqs_endpoint => CONFIG['aws']['sqs']['endpoint']
 )
 
 # Ensure our queue exists
