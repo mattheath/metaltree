@@ -21,6 +21,7 @@ begin
   puts "Queue Created: " + queue.url
 rescue => err
   puts err.to_s
+  exit
 end
 
 # Wait until the queue is available
