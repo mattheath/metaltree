@@ -1,0 +1,12 @@
+# Config File for Metaltree
+
+# Base URI which will be crawled
+uri = "http://www.gumtree.com/flatshare/london/page"
+
+[aws]
+access_key_id = ""
+secret_access_key = ""
+
+[aws.sqs]
+endpoint = "sqs.eu-west-1.amazonaws.com"
+queue_name = "properties"
