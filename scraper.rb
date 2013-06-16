@@ -23,6 +23,28 @@ rescue => err
   puts err.to_s
 end
 
+# Wait until the queue is available
+retry_count = 0
+try_again = true
+while try_again
+  queues = sqs_client.queues
+
+  puts "Queues:"
+  puts queues.map(&:url)
+
+  # Does our queue exist yet?
+  if queues.map(&:url).to_s =~ /\/#{queue_name}/
+    retry_count = 0
+    try_again = false
+    puts "Queue Found"
+  else
+    try_again = true
+    retry_count += 1
+    sleep(1)
+    puts("Queue not available yet - polling (" + retry_count.to_s + ")")
+  end
+end
+
 # Our base uri
 uri = "http://www.gumtree.com/flatshare/london/page"
 
