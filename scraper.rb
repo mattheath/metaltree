@@ -1,4 +1,5 @@
 require 'toml'
+require 'chronic'
 require 'open-uri'
 require 'nokogiri'
 require 'aws'
@@ -13,6 +14,10 @@ uri = CONFIG['uri']
 
 # Starting page
 page = 1
+
+# Maximum posted age to consider (abort after this point)
+max_age = Chronic.parse(CONFIG['max_age'])
+puts "Max age: #{max_age} #{max_age.to_i}"
 
 # SQS queue to use
 queue_name = CONFIG['aws']['sqs']['queue_name']
@@ -88,14 +93,18 @@ while results_found do
 
     puts message.to_json
 
+    # Over maximum age?
+    if timestamp < max_age.to_i
+      puts "over max age!"
+      exit
+    end
+
     # Send message
     status = queue.send_message message.to_json
     puts "Sent with id: #{status.message_id}"
     puts "" # vertical space, yo
 
   end
-
-  exit
 
   # increment page number
   page += 1
