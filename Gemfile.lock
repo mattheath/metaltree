@@ -12,6 +12,7 @@ GEM
       nokogiri (>= 1.4.4)
       uuidtools (~> 2.1)
     builder (3.0.4)
+    chronic (0.9.1)
     citrus (2.4.1)
     dynamoid (0.6.1)
       activemodel
@@ -32,7 +33,9 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  activesupport
   aws-sdk
+  chronic
   dynamoid
   nokogiri
   toml-rb
