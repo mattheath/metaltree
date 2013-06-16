@@ -6,6 +6,13 @@ require 'active_support/all'
 aws_access_key_id = ''
 aws_secret_access_key = ''
 
+# Our base uri
+uri = "http://www.gumtree.com/flatshare/london/page"
+
+# Starting page
+page = 1
+
+# SQS queue to use
 queue_name = 'properties'
 
 # Get started with SQS in the EU
@@ -46,12 +53,7 @@ while try_again
   end
 end
 
-# Our base uri
-uri = "http://www.gumtree.com/flatshare/london/page"
-
-# Starting page
-page = 1
-
+# Start scraping!
 results_found = true
 while results_found do
 
@@ -83,11 +85,11 @@ while results_found do
     }
 
     puts message.to_json
-    puts ""
 
     # Send message
     status = queue.send_message message.to_json
     puts "Sent with id: #{status.message_id}"
+    puts "" # vertical space, yo
 
   end
 
