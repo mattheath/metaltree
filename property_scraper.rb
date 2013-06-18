@@ -6,8 +6,10 @@ require 'aws'
 require 'active_support/all'
 require 'dynamoid'
 
+project_root = File.dirname(File.absolute_path(__FILE__))
+
 # Load Config
-path = File.join(File.dirname(__FILE__), 'config', 'config.toml')
+path = File.join(project_root, 'config', 'config.toml')
 CONFIG = TOML.load_file(path)
 
 # Set our nokogiri user agent
@@ -35,32 +37,8 @@ Dynamoid.configure do |config|
   config.write_capacity = 2 # Write capacity for your tables
 end
 
-# Define our property class to encapsulate properties found
-class Property
-  include Dynamoid::Document
-
-  table :name => :properties, :key => :id
-
-  field :title
-  field :url
-  field :provider
-  field :provider_id
-
-  field :description
-
-  field :couples, :boolean
-
-end
-
-# And a Gumtree property class to store the relationship between Gumtree ID and our ID
-class GumtreeProperty
-  include Dynamoid::Document
-
-  table :name => :gumtree_properties, :key => :gumtree_id
-
-  field :gumtree_id
-  field :property_id
-end
+# Load models
+Dir.glob(project_root + '/models/*', &method(:require))
 
 # Get started with SQS in the EU
 sqs_client = AWS::SQS.new
