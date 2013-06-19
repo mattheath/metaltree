@@ -10,5 +10,9 @@ class Property
 
   field :description
 
+  field :room_type
+  field :property_type
+  field :seller_type
+
   field :couples, :boolean
 end
