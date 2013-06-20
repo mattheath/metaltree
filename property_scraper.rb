@@ -140,26 +140,28 @@ puts "Starting to poll for items in queue..."
 
   attributes = doc.css("ul#vip-attributes li")
 
+  # Run through attributes this property has
+  # Attributes are at the top of the listing
   attributes.each do |attribute|
 
-    puts attr_title = attribute.css("h3")[0].content.strip
-    puts attr_value = attribute.css("p")[0].content.strip
+    attr_title = attribute.css("h3")[0].content.strip
+    attr_value = attribute.css("p")[0].content.strip
 
     case attr_title
-    when "Room type"
-      puts room_type = attr_value
-    when "Available to couples"
-      puts couples = attr_value
-    when "Date available"
-      puts availability_date = attr_value
     when "Property type"
-      puts property_type = attr_value
+      property_type = attr_value
+    when "Room type"
+      room_type = attr_value
     when "Seller type"
-      puts seller_type = attr_value
+      seller_type = attr_value
+    when "Date available"
+      availability_date = attr_value
+    when "Available to couples"
+      couples = (attr_value.downcase == "yes")
     end
-
   end
 
+  # Grab main description
   description = doc.css("#vip-description-text")
 
   location = CGI.parse(URI.parse(doc.css(".open_map")[0]['data-target']).query)["center"]
