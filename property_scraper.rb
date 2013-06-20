@@ -164,7 +164,14 @@ puts "Starting to poll for items in queue..."
   # Grab main description
   description = doc.css("#vip-description-text")
 
-  location = CGI.parse(URI.parse(doc.css(".open_map")[0]['data-target']).query)["center"]
+  # Parse the location from the static Map URL
+  begin
+    location = CGI.parse(URI.parse(doc.css(".open_map")[0]['data-target']).query)["center"]
+    latitude, longitude = location.split(",")
+  rescue
+    latitude = nil
+    longitude = nil
+  end
 
 
   # Store property details
