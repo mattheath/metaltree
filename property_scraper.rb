@@ -121,10 +121,10 @@ puts "Starting to poll for items in queue..."
 
   if notice_msg = doc.at_css('#vip-description .notice')
     if notice_msg.content = 'Sorry, this ad is no longer available.'
-      puts "no longer available"
+      puts "Property no longer available"
       exit
     else
-      puts "notice message? #{notice_msg.content}"
+      puts "unknown notice message? #{notice_msg.content}"
       exit
     end
   else
