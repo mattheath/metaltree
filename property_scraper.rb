@@ -173,8 +173,6 @@ puts "Starting to poll for items in queue..."
   # Parse the location from the static Map URL
   begin
     puts location = CGI.parse(URI.parse(doc.css(".open_map")[0]['data-target']).query)["center"][0].to_s
-
-    puts location.split(",")
     p.latitude, p.longitude = location.split(",")
   rescue
     puts "Failed to parse location from property"
