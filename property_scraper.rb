@@ -155,7 +155,7 @@ puts "Starting to poll for items in queue..."
     when "Seller type"
       p.seller_type = attr_value
     when "Date available"
-      p.availability_date = Time.strptime(attr_value, '%d/%m/%y').utc
+      p.availability_date = DateTime.strptime(attr_value, '%d/%m/%y').to_time.to_i
     when "Available to couples"
       p.couples = (attr_value.downcase == "yes")
     end
