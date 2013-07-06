@@ -144,35 +144,49 @@ puts "Starting to poll for items in queue..."
   # Attributes are at the top of the listing
   attributes.each do |attribute|
 
-    attr_title = attribute.css("h3")[0].content.strip
-    attr_value = attribute.css("p")[0].content.strip
+    puts attr_title = attribute.css("h3")[0].content.strip
+    puts attr_value = attribute.css("p")[0].content.strip
 
     case attr_title
     when "Property type"
-      property_type = attr_value
+      p.property_type = attr_value
     when "Room type"
-      room_type = attr_value
+      p.room_type = attr_value
     when "Seller type"
-      seller_type = attr_value
+      p.seller_type = attr_value
     when "Date available"
-      availability_date = attr_value
+      p.availability_date = Time.strptime(attr_value, '%d/%m/%y').utc
     when "Available to couples"
-      couples = (attr_value.downcase == "yes")
+      p.couples = (attr_value.downcase == "yes")
     end
   end
 
-  # Grab main description
-  description = doc.css("#vip-description-text")
+  # Grab main description & tidy up linebreak cruft
+  description = doc.css("#vip-description-text")[0].content.strip
+  description.gsub! /\r\n/, "\n"
+  description.gsub! /\r/, "\n"
 
   # Parse the location from the static Map URL
   begin
     location = CGI.parse(URI.parse(doc.css(".open_map")[0]['data-target']).query)["center"]
     latitude, longitude = location.split(",")
   rescue
+    puts "Failed to parse location from property"
     latitude = nil
     longitude = nil
   end
 
+  puts "\n\nParsed data:"
+
+  puts title
+  puts price
+  puts p.property_type
+  puts p.room_type
+  puts p.seller_type
+  puts p.availability_date
+  puts p.couples
+  puts p.latitude
+  puts p.longitude
 
   # Store property details
   p.title = title
@@ -185,9 +199,7 @@ puts "Starting to poll for items in queue..."
   p.seller_type = seller_type ||= nil
   p.property_type = property_type ||= nil
   p.room_type = room_type ||= nil
-
   p.couples = couples ||= false
-
 
   p.save
 
