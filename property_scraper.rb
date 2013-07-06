@@ -195,11 +195,11 @@ puts "Starting to poll for items in queue..."
   p.provider_id = item['provider_id']
   p.description = description
 
-  p.availability_date = availability_date ||= nil
-  p.seller_type = seller_type ||= nil
-  p.property_type = property_type ||= nil
-  p.room_type = room_type ||= nil
-  p.couples = couples ||= false
+  p.availability_date = p.availability_date ||= nil
+  p.seller_type = p.seller_type ||= nil
+  p.property_type = p.property_type ||= nil
+  p.room_type = p.room_type ||= nil
+  p.couples = p.couples ||= false
 
   p.save
 
