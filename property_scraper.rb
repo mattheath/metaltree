@@ -175,6 +175,7 @@ puts "Starting to poll for items in queue..."
     p.longitude = nil
   end
 
+  # Output details of property if in debug mode
   if debug
     puts "*** #{title}"
     puts "    price: #{price}"
