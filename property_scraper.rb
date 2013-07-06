@@ -12,6 +12,8 @@ project_root = File.dirname(File.absolute_path(__FILE__))
 path = File.join(project_root, 'config', 'config.toml')
 CONFIG = TOML.load_file(path)
 
+debug = true
+
 # Set our nokogiri user agent
 user_agent = CONFIG['nokogiri']['user_agent']
 
@@ -131,29 +133,24 @@ puts "Starting to poll for items in queue..."
     puts "We're good!"
   end
 
-  puts doc.content
-
   title = doc.css("#primary-h1 span")[0].content
   price = doc.css(".ad-price")[0].content
-
-  puts "price: #{price}"
-
   attributes = doc.css("ul#vip-attributes li")
 
   # Run through attributes this property has
   # Attributes are at the top of the listing
   attributes.each do |attribute|
 
-    puts attr_title = attribute.css("h3")[0].content.strip
-    puts attr_value = attribute.css("p")[0].content.strip
+    attr_title = attribute.css("h3")[0].content.strip
+    attr_value = attribute.css("p")[0].content.strip
 
     case attr_title
     when "Property type"
-      p.property_type = attr_value
+      p.property_type = attr_value.downcase
     when "Room type"
-      p.room_type = attr_value
+      p.room_type = attr_value.downcase
     when "Seller type"
-      p.seller_type = attr_value
+      p.seller_type = attr_value.downcase
     when "Date available"
       p.availability_date = DateTime.strptime(attr_value, '%d/%m/%y').to_time.to_i
     when "Available to couples"
@@ -168,25 +165,27 @@ puts "Starting to poll for items in queue..."
 
   # Parse the location from the static Map URL
   begin
-    location = CGI.parse(URI.parse(doc.css(".open_map")[0]['data-target']).query)["center"]
-    latitude, longitude = location.split(",")
+    puts location = CGI.parse(URI.parse(doc.css(".open_map")[0]['data-target']).query)["center"][0].to_s
+
+    puts location.split(",")
+    p.latitude, p.longitude = location.split(",")
   rescue
     puts "Failed to parse location from property"
-    latitude = nil
-    longitude = nil
+    p.latitude = nil
+    p.longitude = nil
   end
 
-  puts "\n\nParsed data:"
-
-  puts title
-  puts price
-  puts p.property_type
-  puts p.room_type
-  puts p.seller_type
-  puts p.availability_date
-  puts p.couples
-  puts p.latitude
-  puts p.longitude
+  if debug
+    puts "*** #{title}"
+    puts "    price: #{price}"
+    puts "    property type: #{p.property_type}"
+    puts "    room type: #{p.room_type}"
+    puts "    seller: #{p.seller_type}"
+    puts "    available: #{p.availability_date}"
+    puts "    couples: #{p.couples}"
+    puts "    lat: #{p.latitude}"
+    puts "    lon: #{p.longitude}"
+  end
 
   # Store property details
   p.title = title
