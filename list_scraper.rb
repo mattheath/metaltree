@@ -79,7 +79,8 @@ while results_found do
     id        = item.css("a.description")[0]['id'].scan(/\d+/).first
     title     = item.css("h3")[0].content.strip[0...100]
     link      = item.css("a")[0]['href'].strip
-    created   = Time.strptime(item.css("span.dtlisted")[0]['title'].strip, '%Y%m%dT%H%M%S%z').utc
+    puts item.css("span.dtlisted")[0]['title'].strip
+    created   = Time.strptime(item.css("span.dtlisted")[0]['title'].strip, '%Y-%m-%dT%H:%M:%S%z').utc
     timestamp = created.to_i
 
     # Build our message
