@@ -134,7 +134,6 @@ puts "Starting to poll for items in queue..."
   end
 
   title = doc.css("#primary-h1 span")[0].content
-  price = doc.css(".ad-price")[0].content
   attributes = doc.css("ul#vip-attributes li")
 
   # Run through attributes this property has
@@ -163,6 +162,14 @@ puts "Starting to poll for items in queue..."
   description.gsub! /\r\n/, "\n"
   description.gsub! /\r/, "\n"
 
+  # Grab numeric value to calculate cost per month
+  price = doc.css(".ad-price")[0].content
+  cpm = price.gsub(/[^0-9]/, "").to_i
+  if price.match /pw/
+    puts "per week"
+    cpm = (cpm * 52) / 12
+  end
+
   # Parse the location from the static Map URL
   begin
     puts location = CGI.parse(URI.parse(doc.css(".open_map")[0]['data-target']).query)["center"][0].to_s
@@ -179,6 +186,7 @@ puts "Starting to poll for items in queue..."
   if debug
     puts "*** #{title}"
     puts "    price: #{price}"
+    puts "    price per month: #{cpm}"
     puts "    property type: #{p.property_type}"
     puts "    room type: #{p.room_type}"
     puts "    seller: #{p.seller_type}"
