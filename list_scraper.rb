@@ -4,6 +4,9 @@ require 'open-uri'
 require 'nokogiri'
 require 'aws'
 require 'active_support/all'
+require 'dynamoid'
+
+project_root = File.dirname(File.absolute_path(__FILE__))
 
 # Load Config
 path = File.join(File.dirname(__FILE__), 'config', 'config.toml')
@@ -22,12 +25,30 @@ puts "Max age: #{max_age} #{max_age.to_i}"
 # SQS queue to use
 queue_name = CONFIG['aws']['sqs']['queue_name']
 
-# Get started with SQS in the EU
-sqs_client = AWS::SQS.new(
+# Set up AWS config
+AWS.config({
   :access_key_id => CONFIG['aws']['access_key_id'],
   :secret_access_key => CONFIG['aws']['secret_access_key'],
-  :sqs_endpoint => CONFIG['aws']['sqs']['endpoint']
-)
+  :dynamo_db_endpoint => CONFIG['aws']['dynamodb']['endpoint'],
+  :sqs_endpoint => CONFIG['aws']['sqs']['endpoint'],
+})
+
+# Se up Dynamoid adapter for DynamoDB
+Dynamoid.configure do |config|
+  config.adapter = 'aws_sdk' # This adapter establishes a connection to the DynamoDB servers using Amazon's own AWS gem.
+  config.namespace = "nearhere" # To namespace tables created by Dynamoid from other tables you might have.
+  config.warn_on_scan = true # Output a warning to the logger when you perform a scan rather than a query on a table.
+  config.partitioning = false # Spread writes randomly across the database. See "partitioning" below for more.
+  config.partition_size = 200  # Determine the key space size that writes are randomly spread across.
+  config.read_capacity = 3 # Read capacity for your tables
+  config.write_capacity = 2 # Write capacity for your tables
+end
+
+# Load models
+Dir.glob(project_root + '/models/*', &method(:require))
+
+# Get started with SQS in the EU
+sqs_client = AWS::SQS.new
 
 # Ensure our queue exists
 begin
@@ -76,7 +97,21 @@ while results_found do
   # Run through results
   items.each do |item|
 
-    id        = item.css("a.description")[0]['id'].scan(/\d+/).first
+    id = item.css("a.description")[0]['id'].scan(/\d+/).first.strip
+
+    puts id
+
+    gp = GumtreeProperty.find(id)
+    already_scraped = !! gp
+
+    if already_scraped
+      puts "Already Scraped this property (#{id}) \n"
+      already_scraped_page = true
+    else
+      puts "Not scraped...\n"
+    end
+
+    # Scrape remainder of link
     title     = item.css("h3")[0].content.strip[0...100]
     link      = item.css("a")[0]['href'].strip
     puts item.css("span.dtlisted")[0]['title'].strip
