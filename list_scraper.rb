@@ -82,8 +82,12 @@ while try_again
 end
 
 # Start scraping!
+continue_scraping = true
 results_found = true
-while results_found do
+max_remaining_pages = 2
+while continue_scraping do
+
+  already_scraped_page = false
 
   puts "loading page #{page}"
   doc = Nokogiri::HTML(open("#{uri}#{page}"))
@@ -145,8 +149,22 @@ while results_found do
   # increment page number
   page += 1
 
+  # if we've already encountered a result on this page decrement the max remaining pages by one
+  if already_scraped_page
+    max_remaining_pages = max_remaining_pages - 1
+    puts "\n\n\n\n\n\n\n"
+    puts "***** Decrementing remaining pages by 1 *****"
+    puts "\n\n\n\n\n\n\n"
+  end
+
   # rate limit if we did have results before checking next page
   sleep 1 if items.length > 0
+
+  # Only continue if we still have results, and we've not run out of pages we want to scrape
+  unless results_found && max_remaining_pages > 0
+    puts "Shutting down scraper..."
+    continue_scraping = false
+  end
 
 end
 
