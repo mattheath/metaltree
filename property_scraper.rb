@@ -211,6 +211,7 @@ queue.poll do |msg|
     puts "    couples: #{p.couples}"
     puts "    lat: #{p.latitude}"
     puts "    lon: #{p.longitude}"
+    puts "    created: #{item['created']}"
   end
 
   # Store property details
@@ -221,6 +222,7 @@ queue.poll do |msg|
   p.description = description
   p.price = price
   p.cpm = cpm
+  p.posted = item['created']
 
   p.availability_date = p.availability_date ||= nil
   p.seller_type = p.seller_type ||= nil

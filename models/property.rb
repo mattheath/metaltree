@@ -5,6 +5,7 @@ class Property
 
   field :title
   field :url
+  field :posted
   field :provider
   field :provider_id
 
