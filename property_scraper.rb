@@ -79,24 +79,24 @@ end
 
 # Start polling the queue for pages to scrape
 puts "Starting to poll for items in queue..."
-#queue.receive_message do |msg|
-#  puts "\nRECEIVED: #{msg.body}"
+queue.poll do |msg|
+  puts "\nRECEIVED: #{msg.body}"
 #end
 
 
   # Testing data
-  msg = {}
+  #msg = {}
 
   # 1 - not available
-  msg['body'] = '{"link":"http://www.gumtree.com/p/flats-houses/double-room-with-own-bathroom-in-west-kensington-fulham-hammersmith-w14-located-a-few-minutes-w/1022132697","provider":"gumtree","provider_id":"1022132697","title":"Double room with own bathroom in West Kensington- Fulham, Hammersmith. w14 Located a few minutes w","created":1371380134}'
+  #msg['body'] = '{"link":"http://www.gumtree.com/p/flats-houses/double-room-with-own-bathroom-in-west-kensington-fulham-hammersmith-w14-located-a-few-minutes-w/1022132697","provider":"gumtree","provider_id":"1022132697","title":"Double room with own bathroom in West Kensington- Fulham, Hammersmith. w14 Located a few minutes w","created":1371380134}'
 
   # 2 - available
-  msg['body'] = '{"link":"http://www.gumtree.com/p/flats-houses/stratford-large-double-room-available-near-westfield-shopping-centregirls-only/1022132765","provider":"gumtree","provider_id":"1022132765","title":"Stratford-Large double room available near Westfield shopping centre(girls only)","created":1371380168}'
+  #msg['body'] = '{"link":"http://www.gumtree.com/p/flats-houses/stratford-large-double-room-available-near-westfield-shopping-centregirls-only/1022132765","provider":"gumtree","provider_id":"1022132765","title":"Stratford-Large double room available near Westfield shopping centre(girls only)","created":1371380168}'
 
-  item = JSON.parse(msg['body'])
+  #item = JSON.parse(msg['body'])
 
   #puts "\nRECEIVED: #{msg.body}"
-  #item = JSON.parse(msg.body)
+  item = JSON.parse(msg.body)
 
   puts item
 
@@ -124,10 +124,10 @@ puts "Starting to poll for items in queue..."
   if notice_msg = doc.at_css('#vip-description .notice')
     if notice_msg.content = 'Sorry, this ad is no longer available.'
       puts "Property no longer available"
-      exit
+      next
     else
       puts "unknown notice message? #{notice_msg.content}"
-      exit
+      next
     end
   else
     puts "We're good!"
@@ -217,3 +217,4 @@ puts "Starting to poll for items in queue..."
   gp.property_id = p.id
   gp.save
 
+end
