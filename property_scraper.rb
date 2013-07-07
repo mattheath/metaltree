@@ -54,6 +54,19 @@ rescue => err
   exit
 end
 
+# Grab a web page
+def get_response(uri, options)
+
+  url = URI.parse(uri)
+  req = Net::HTTP::Get.new(uri)
+  req.add_field('User-Agent', options['user-agent']) if options['user-agent']
+  res = Net::HTTP.start(url.host, url.port) {|http| http.request(req) }
+
+  raise "Error loading property - might not exist? Response code: #{res.code}" unless res.code == "200"
+
+  res.body
+end
+
 # Wait until the queue is available
 retry_count = 0
 try_again = true
@@ -119,7 +132,13 @@ queue.poll do |msg|
   # Scrape ALL the things
   puts "SCRAPING: #{item['link']}"
 
-  doc = Nokogiri::HTML(open(item['link'], "User-Agent" => user_agent))
+  begin
+    doc = Nokogiri::HTML(get_response(item['link'], {"User-Agent" => user_agent}))
+  rescue Exception => e
+    puts e.message
+    puts "Skipping #{item['provider']} property #{item['provider_id']}"
+    next
+  end
 
   if notice_msg = doc.at_css('#vip-description .notice')
     if notice_msg.content = 'Sorry, this ad is no longer available.'
