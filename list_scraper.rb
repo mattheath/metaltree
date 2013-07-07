@@ -122,6 +122,7 @@ while continue_scraping do
     if already_scraped
       puts "Already Scraped this property (#{id}) \n"
       previously_seen += 1
+      next if not rescrape_properties
     else
       puts "Not scraped...\n"
     end
