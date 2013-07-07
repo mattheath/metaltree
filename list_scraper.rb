@@ -22,6 +22,9 @@ page = 1
 max_age = Chronic.parse(CONFIG['max_age'])
 puts "Max age: #{max_age} #{max_age.to_i}"
 
+# Should we rescrape previously gathered properties?
+rescrape_properties = CONFIG['rescrape_properties'] || false
+
 # SQS queue to use
 queue_name = CONFIG['aws']['sqs']['queue_name']
 
@@ -150,7 +153,7 @@ while continue_scraping do
   page += 1
 
   # if we've already encountered a result on this page decrement the max remaining pages by one
-  if already_scraped_page
+  if already_scraped_page && !rescrape_properties
     max_remaining_pages = max_remaining_pages - 1
     puts "\n\n\n\n\n\n\n"
     puts "***** Decrementing remaining pages by 1 *****"
