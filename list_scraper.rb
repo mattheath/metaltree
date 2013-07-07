@@ -139,7 +139,7 @@ while continue_scraping do
     # Over maximum age?
     if timestamp < max_age.to_i
       puts "over max age!"
-      exit
+      continue_scraping = false
     end
 
     # Send message
