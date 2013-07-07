@@ -200,6 +200,8 @@ puts "Starting to poll for items in queue..."
   p.provider = item['provider']
   p.provider_id = item['provider_id']
   p.description = description
+  p.price = price
+  p.cpm = cpm
 
   p.availability_date = p.availability_date ||= nil
   p.seller_type = p.seller_type ||= nil
