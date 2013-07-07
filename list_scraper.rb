@@ -24,6 +24,7 @@ puts "Max age: #{max_age} #{max_age.to_i}"
 
 # Should we rescrape previously gathered properties?
 rescrape_properties = CONFIG['rescrape_properties'] || false
+shutdown_ratio = 0.8
 
 # SQS queue to use
 queue_name = CONFIG['aws']['sqs']['queue_name']
@@ -101,6 +102,12 @@ while continue_scraping do
   # Abort if there are no more results
   results_found = false if items.length == 0
 
+  # Grab how many items on the page
+  num_results_on_page = items.length
+
+  # Reset number we've seen previously to zero
+  previously_seen = 0
+
   # Run through results
   items.each do |item|
 
@@ -111,9 +118,10 @@ while continue_scraping do
     gp = GumtreeProperty.find(id)
     already_scraped = !! gp
 
+    # Increment our 'seen' counter if it's already in the DB
     if already_scraped
       puts "Already Scraped this property (#{id}) \n"
-      already_scraped_page = true
+      previously_seen += 1
     else
       puts "Not scraped...\n"
     end
@@ -152,8 +160,9 @@ while continue_scraping do
   # increment page number
   page += 1
 
-  # if we've already encountered a result on this page decrement the max remaining pages by one
-  if already_scraped_page && !rescrape_properties
+  # if we've already seen more than a specific ratio of results on this page decrement the max remaining pages by one
+  # unless we're just rescraping everything
+  if num_results_on_page > 0 && (previously_seen.to_f / num_results_on_page.to_f) > shutdown_ratio  && !rescrape_properties
     max_remaining_pages = max_remaining_pages - 1
     puts "\n\n\n\n\n\n\n"
     puts "***** Decrementing remaining pages by 1 *****"
@@ -161,7 +170,7 @@ while continue_scraping do
   end
 
   # rate limit if we did have results before checking next page
-  sleep 1 if items.length > 0
+  sleep 1 if num_results_on_page > 0
 
   # Only continue if we still have results, and we've not run out of pages we want to scrape
   unless results_found && max_remaining_pages > 0
