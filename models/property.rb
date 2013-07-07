@@ -9,6 +9,8 @@ class Property
   field :provider_id
 
   field :description
+  field :price
+  field :cpm
 
   field :latitude
   field :longitude
